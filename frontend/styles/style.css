@@ -1,0 +1,221 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body,
+html {
+  font-family: Arial;
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+#sistema {
+  min-height: 100vh; /* Garante que ocupe no mínimo a altura da tela */
+  width: 100%;
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a0000 40%, #8b0000 100%);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centraliza o conteúdo horizontalmente */
+}
+.container {
+  max-width: 1000px;
+  margin: auto;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6); /* Cor preta com transparência */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* A caixa branca do formulário */
+.modal-content {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content-detalhes {
+  background: white;
+  padding: 30px; /* Aumentei um pouco o respiro geral */
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  height: auto; /* Mudei para auto para o espaço se ajustar ao texto */
+  max-height: 600px;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  overflow-y: auto; /* Adiciona scroll se o texto for muito grande */
+}
+
+/* Foco na Fonte e no Espaço */
+#conteudo-detalhes p {
+  font-size: 1.25rem; /* Fonte grande e legível (aprox. 20px) */
+  margin-bottom: 15px; /* Espaço generoso entre cada linha/item */
+  line-height: 1.6; /* Espaçamento entre frases do mesmo parágrafo */
+  color: #333;
+}
+#conteudo-detalhes strong {
+  font-weight: 700; /* Deixa os títulos (Tipo, Cliente) bem destacados */
+  color: #000;
+}
+
+/* Espaço extra apenas para o título principal */
+.modal-content-detalhes h2 {
+  margin-bottom: 15px;
+  font-size: 1.6rem;
+}
+
+.modal-content-lista {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+
+  max-height: 90vh; /* Limita altura */
+  overflow-y: auto; /* Ativa scroll vertical */
+  overflow-x: hidden; /* Evita scroll lateral */
+
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Botão de fechar (X) */
+.fechar {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+/* Classe para esconder (você já deve ter, mas garanta que está aqui) */
+.hidden {
+  display: none !important;
+}
+
+/* Centraliza na tela inteira */
+.login-wrapper {
+  position: fixed; /* cobre a tela inteira */
+  inset: 0; /* top:0 right:0 bottom:0 left:0 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+
+  background: radial-gradient(circle at center, #b30000 0%, #000000 70%);
+}
+
+/* Card branco */
+.login-card {
+  background: white;
+  padding: 40px 30px;
+  width: 100%;
+  max-width: 350px;
+  border-radius: 12px;
+  border-style: outset;
+  box-shadow: 0 10px 30px rgb(0, 0, 0);
+  text-align: center;
+  position: relative;
+}
+
+/* Logo */
+.login-avatar {
+  width: 90px; /* círculo menor */
+  height: 90px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: -70px auto 20px auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.582);
+  outline: 1px solid rgba(0, 0, 0, 0.582);
+}
+
+.login-avatar img {
+  width: 70px; /* imagem proporcionalmente menor */
+  height: auto;
+  display: block;
+}
+
+/* Inputs mais modernos */
+.login-card input {
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+/* Botão estilizado */
+.btn-login {
+  margin-top: 15px;
+  padding: 12px;
+  background: #e53935;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  transition: 0.3s;
+}
+
+.btn-login:hover {
+  background: #c62828;
+}
+
+input,
+select,
+textarea,
+button {
+  width: 100%;
+  padding: 8px;
+  margin: 5px 0;
+}
+button {
+  cursor: pointer;
+}
+.card {
+  background: white;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+.Pendente {
+  border: 3px solid #ff4d4d;
+  border-left: 6px solid #ff4d4d;
+  background-color: #ff000044;
+}
+.Andamento {
+  border: 3px solid #ffc107;
+  border-left: 6px solid #ffc107;
+  background-color: #e5ff0044;
+}
+.Finalizado {
+  border: 3px solid #28a745;
+  border-left: 6px solid #28a745;
+  background-color: #00ff0d44;
+}
+.hidden {
+  display: none;
+}

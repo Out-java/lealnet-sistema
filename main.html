@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Sistema Provedor</title>
+    <link rel="stylesheet" href="frontend/styles/style.css" />
+  </head>
+
+  <body>
+    <div id="loginArea" class="login-wrapper">
+      <div class="login-card">
+        <div class="login-avatar">
+          <img src="frontend/imgs/logonova.png" alt="Logo" />
+        </div>
+        <div class="container">
+          <h2>Login</h2>
+          <input type="email" id="email" placeholder="Email" />
+          <input type="password" id="senha" placeholder="Senha" />
+          <button class="btn-login">ENTRAR</button>
+        </div>
+      </div>
+    </div>
+    <div id="sistema" class="hidden" class="sistema">
+      <button id="btn-abrir-modal" onclick="abrirModal()" class="btn-principal">
+        Novo Atendimento
+      </button>
+
+      <div id="modal-atendimento" class="modal-overlay hidden">
+        <div class="modal-content">
+          <span id="btn-fechar-modal" onclick="fecharModal()" class="fechar"
+            >&times;</span
+          >
+
+          <h2>Novo Atendimento</h2>
+
+          <select id="tipo">
+            <option value="" disabled selected>Tipo:</option>
+            <option value="Manutencao">Manutenção</option>
+            <option value="Instalacao">Instalação</option>
+            <option value="Retirada">Retirada</option>
+          </select>
+
+          <select id="tecnico">
+            <option value="" disabled selected>Escolha um técnico</option>
+            <option value="6a0bd7c3-25c2-4259-8385-2150eb5c62b1">Gilmar</option>
+            <option value="0c7367db-9647-4990-b504-0688365374df">Miro</option>
+            <option value="61304bff-55dd-4e98-a928-f26288699280">
+              Alberto
+            </option>
+          </select>
+
+          <input type="text" id="cliente" placeholder="Nome do cliente" />
+          <input type="text" id="telefone" placeholder="Telefone" />
+          <input type="text" id="endereco" placeholder="Endereço" />
+
+          <select id="status">
+            <option value="" disabled selected>Situação:</option>
+            <option value="pendente">Pendente</option>
+            <option value="andamento">Em andamento</option>
+            <option value="finalizado">Finalizado</option>
+          </select>
+
+          <textarea id="obs" placeholder="Observações"></textarea>
+          <input type="file" id="foto" />
+
+          <button onclick="criar()">Salvar Atendimento</button>
+        </div>
+      </div>
+
+      <button
+        onclick="window.location.href = 'atendimentos.html'"
+        class="btn-principal"
+      >
+        Ver Atendimentos
+      </button>
+    </div>
+    <script type="module" src="backend/script.js"></script>
+  </body>
+</html>
