@@ -16,17 +16,17 @@
           <h2>Login</h2>
           <input type="email" id="email" placeholder="Email" />
           <input type="password" id="senha" placeholder="Senha" />
-          <button class="btn-login">ENTRAR</button>
+          <button onclick="login()" class="btn-login">ENTRAR</button>
         </div>
       </div>
     </div>
-    <div id="sistema" class="hidden" class="sistema">
+    <div id="sistema" class="hidden sistema">
       <button id="btn-abrir-modal" onclick="abrirModal()" class="btn-principal">
         Novo Atendimento
       </button>
 
       <div id="modal-atendimento" class="modal-overlay hidden">
-        <div class="modal-content">
+        <form class="modal-content">
           <span id="btn-fechar-modal" onclick="fecharModal()" class="fechar"
             >&times;</span
           >
@@ -64,7 +64,7 @@
           <input type="file" id="foto" />
 
           <button onclick="criar()">Salvar Atendimento</button>
-        </div>
+        </form>
       </div>
 
       <button

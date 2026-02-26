@@ -1,93 +1,89 @@
-import { supabaseCliente } from './server.js';
+import { supabaseCliente } from "./server.js";
+
 const TEMPO_LIMITE = 3 * 60 * 60 * 1000;
 let usuario = null;
-
 // Declare as variáveis no topo, mas não atribua valor ainda
-let modal,
-  btnLogin,
-  sistemaArea,
-  loginArea,
-  modalLista,
-  modalDetalhes,
-  conteudoDetalhes;
+let sistemaArea, loginArea, modal;
 
-// --- FUNÇÕES DE INTERFACE ---
+// FUNÇÕES DE INTERFACE
+//NOVO ATENDIMENTO
 function abrirModal() {
-  if (modal) modal.classList.remove('hidden');
+  if (modal) modal.classList.remove("hidden");
 }
 
 function fecharModal() {
-  if (modal) modal.classList.add('hidden');
+  if (modal) modal.classList.add("hidden");
 }
 
-// FUNÇÃO CORRIGIDA: Agora ela usa a variável que preencheremos no carregamento
-function abrirModalLista() {
-  if (modalLista) {
-    modalLista.classList.remove('hidden');
-    carregar(); // Aproveita para atualizar a lista ao abrir
-  } else {
-    console.error('Erro: modalLista não foi encontrado no DOM.');
-  }
+// 1. ESSA FUNÇÃO MOSTRA O LOGIN
+function ocultarSistema() {
+  if (sistemaArea) sistemaArea.classList.add("hidden");
+  if (loginArea) loginArea.classList.remove("hidden");
 }
-
-function fecharModalLista() {
-  if (modalLista) modalLista.classList.add('hidden');
-}
-
+// 2. ESSA FUNÇÃO MOSTRA O SISTEMA (CHAMAR APÓS LOGIN SUCESSO)
 function mostrarSistema() {
-  if (sistemaArea) sistemaArea.classList.remove('hidden');
-  if (loginArea) loginArea.classList.add('hidden');
-  if (typeof carregar === 'function') carregar();
+  if (sistemaArea) sistemaArea.classList.remove("hidden");
+  if (loginArea) loginArea.classList.add("hidden");
 }
 
-// --- LÓGICA DE LOGIN ---
+// LÓGICA DE LOGIN
 async function login() {
-  const emailField = document.getElementById('email').value;
-  const senhaField = document.getElementById('senha').value;
+  //Pega os valores do front-end
+  const emailInput = document.getElementById("email").value;
+  const senhaInput = document.getElementById("senha").value;
 
   if (!emailInput || !senhaInput) {
-    alert('Preencha email e senha.');
+    alert("Preencha email e senha.");
     return;
   }
-  const emailInput = emailField.value;
-  const senhaInput = senhaField.value;
-
+  //TRANSFORMA O BOTÃO DE ENTRAR(LOGIN) PARA CARREGANDO...
+  const btnLogin = document.querySelector(".btn-login");
+  if (!btnLogin) {
+    console.error("Botão de login não encontrado no DOM");
+    return;
+  }
+  //Pega o texto original pra colocar novamente caso de erro =
   const textoOriginal = btnLogin.innerText;
-  btnLogin.innerText = 'Carregando...';
+  btnLogin.innerText = "Carregando...";
   btnLogin.disabled = true;
 
+  //LOGIN NO BANCO DE DADOS COM USUARIO
   const { data, error } = await supabaseCliente.auth.signInWithPassword({
     email: emailInput,
     password: senhaInput,
   });
 
   if (error) {
-    alert('Erro no login: ' + error.message);
+    alert("Erro no login: " + error.message);
     btnLogin.innerText = textoOriginal;
     btnLogin.disabled = false;
     return;
   }
-
+  // GUARDA O USUARIO NO DATA DE USUARIO
   usuario = data.user;
-  localStorage.setItem('loginTime', Date.now());
+  //INICIA O TOKEN DE SESSÇÃO
+  localStorage.setItem("loginTime", Date.now());
   setTimeout(executarLogoutAutomatico, TEMPO_LIMITE);
 
   mostrarSistema();
 
+  // SE DER ERRO NO LOGIN VOLTA AO NORMAL
   btnLogin.innerText = textoOriginal;
   btnLogin.disabled = false;
 }
 
-// --- LÓGICA DE LOGOUT ---
+// LÓGICA DE LOGOUT
 async function executarLogoutAutomatico() {
-  console.log('Sessão expirada. Executando logout...');
-  localStorage.removeItem('loginTime');
+  console.log("Sessão expirada. Executando logout...");
+  localStorage.removeItem("loginTime");
 
-  if (typeof supabaseCliente !== 'undefined') {
+  //SE NÃO TIVER FEITO LOGIN
+  if (typeof supabaseCliente !== "undefined") {
     await supabaseCliente.auth.signOut();
   }
 
-  alert('Sua sessão expirou.');
+  alert("Sua sessão expirou.");
+  //RECARREGA A PAGINA
   location.reload();
 }
 
@@ -95,45 +91,50 @@ async function logout() {
   await executarLogoutAutomatico();
 }
 
-function verificacaoCriacao(cliente, tipo, status) {
+// Verificações se tem o nome do cliente, tipo e status e se esta logado
+function verificacaoCriacao(usuario, cliente, tipo, status) {
+  if (!usuario) {
+    alert("Faça login primeiro");
+    return false;
+  }
   if (!cliente) {
-    alert('O nome do cliente é obrigatório.');
+    alert("O nome do cliente é obrigatório.");
     return false;
   }
 
   if (!tipo) {
-    alert('O Tipo é obrigatório.');
+    alert("O Tipo é obrigatório.");
     return false;
   }
 
   if (!status) {
-    alert('O status é obrigatório.');
+    alert("O status é obrigatório.");
     return false;
   }
 
   return true;
 }
-// --- LÓGICA DE CRIAÇÃO E CARREGAMENTO ---
+// LÓGICA DE CRIAÇÃO E CARREGAMENTO
 async function criar() {
-  if (!usuario) {
-    alert('Faça login primeiro');
-    return;
-  }
+  const tipoInput = document.getElementById("tipo").value;
+  const tecnicoInput = document.getElementById("tecnico").value;
+  const clienteInput = document.getElementById("cliente").value;
+  const telefoneInput = document.getElementById("telefone").value;
+  const enderecoInput = document.getElementById("endereco").value;
+  const statusInput = document.getElementById("status").value;
+  const obsInput = document.getElementById("obs").value;
+  const fotoInput = document.getElementById("foto");
 
-  const tipoInput = document.getElementById('tipo').value;
-  const tecnicoInput = document.getElementById('tecnico').value;
-  const clienteInput = document.getElementById('cliente').value;
-  const telefoneInput = document.getElementById('telefone').value;
-  const enderecoInput = document.getElementById('endereco').value;
-  const statusInput = document.getElementById('status').value;
-  const obsInput = document.getElementById('obs').value;
-  const fotoInput = document.getElementById('foto');
-
-  const valido = verificacaoCriacao(clienteInput, tipoInput, statusInput);
+  const valido = verificacaoCriacao(
+    usuario,
+    clienteInput,
+    tipoInput,
+    statusInput,
+  );
   if (!valido) return;
 
   const { data, error } = await supabaseCliente
-    .from('atendimentos')
+    .from("atendimentos")
     .insert([
       {
         tipo: tipoInput,
@@ -148,7 +149,7 @@ async function criar() {
     ])
     .select();
 
-  if (error) return alert('Erro ao salvar atendimento: ' + error.message);
+  if (error) return alert("Erro ao salvar atendimento: " + error.message);
 
   const atendimentoId = data[0].id;
   const file = fotoInput.files[0];
@@ -156,16 +157,16 @@ async function criar() {
   if (file) {
     const { data: uploadData, error: uploadError } =
       await supabaseCliente.storage
-        .from('atendimentos')
+        .from("atendimentos")
         .upload(`${atendimentoId}/${file.name}`, file);
 
     if (uploadError) {
       alert(
-        'Atendimento criado, mas erro ao enviar foto: ' + uploadError.message
+        "Atendimento criado, mas erro ao enviar foto: " + uploadError.message,
       );
     } else {
       const { error: anexoError } = await supabaseCliente
-        .from('anexos')
+        .from("anexos")
         .insert([
           {
             atendimento_id: atendimentoId,
@@ -175,176 +176,75 @@ async function criar() {
         ]);
 
       if (anexoError)
-        console.error('Erro ao registrar anexo no banco: ', anexoError);
+        console.error("Erro ao registrar anexo no banco: ", anexoError);
     }
   }
 
   // Limpar os campos
-  document.getElementById('cliente').value = '';
-  document.getElementById('telefone').value = '';
-  document.getElementById('tecnico').value = '';
-  document.getElementById('endereco').value = '';
-  document.getElementById('obs').value = '';
-  document.getElementById('foto').value = '';
+  document.getElementById("cliente").value = "";
+  document.getElementById("telefone").value = "";
+  document.getElementById("tecnico").value = "";
+  document.getElementById("endereco").value = "";
+  document.getElementById("obs").value = "";
+  document.getElementById("foto").value = "";
 
-  alert('Atendimento salvo com sucesso!');
+  alert("Atendimento salvo com sucesso!");
   fecharModal();
-  carregar();
 }
 
-async function carregar() {
-  // O 'data' é criado aqui dentro desta linha:
-  const { data, error } = await supabaseCliente
-    .from('atendimentos')
-    .select(`*, tecnicos!atendimentos_tecnico_id_fkey (nome)`)
-    .order('data_abertura', { ascending: false });
-
-  if (error) {
-    console.error('Erro ao carregar atendimentos:', error);
-    return;
-  }
-
-  // Se o Supabase não retornar nada, 'data' será um array vazio []
-  const lista = document.getElementById('lista');
-  if (!lista) return;
-
-  lista.innerHTML = '';
-
-  if (!data || data.length === 0) {
-    lista.innerHTML = '<p>Nenhum atendimento encontrado.</p>';
-    return;
-  }
-
-  // Agora o 'data' existe e podemos usar o forEach
-  data.forEach((a) => {
-    const nomeExibicao =
-      a.tecnicos?.nome || a.atendimentos_tecnico_id_fkey?.nome || 'Sem técnico';
-
-    const card = document.createElement('div');
-    card.className = `card ${a.status}`;
-    card.style.cursor = 'pointer';
-
-    card.innerHTML = `
-        <strong>${a.tipo.toUpperCase()}</strong><br>
-        <strong>Técnico:</strong> ${nomeExibicao} <br>
-        Cliente: ${a.cliente_nome}<br>
-        Status: ${a.status}
-    `;
-
-    // Vincula o clique ao card para abrir o detalhe
-    card.onclick = () => {
-      console.log('Abrindo detalhes de:', a.cliente_nome);
-      abrirDetalhes(a);
-    };
-
-    lista.appendChild(card);
-  });
-}
-function abrirDetalhes(atendimento) {
-  // Buscamos o elemento na hora do clique para não ter erro de referência nula
-  const modalDet = document.getElementById('modal-detalhes');
-  const conteudoDet = document.getElementById('conteudo-detalhes');
-
-  // Se mesmo assim não achar, o problema é o ID no arquivo HTML
-  if (!modalDet || !conteudoDet) {
-    console.error(
-      'ERRO CRÍTICO: O ID "modal-detalhes" ou "conteudo-detalhes" não existe no seu HTML.'
-    );
-    alert('Erro interno: Elemento de detalhes não encontrado.');
-    return;
-  }
-
-  const nomeExibicao =
-    atendimento.tecnicos?.nome ||
-    atendimento.atendimentos_tecnico_id_fkey?.nome ||
-    'Sem técnico';
-
-  conteudoDet.innerHTML = `
-    <p><strong>Tipo:</strong> ${atendimento.tipo}</p>
-    <p><strong>Cliente:</strong> ${atendimento.cliente_nome}</p>
-    <p><strong>Técnico:</strong> ${nomeExibicao}</p>
-    <p><strong>Status:</strong> ${atendimento.status}</p>
-    <p><strong>Observações:</strong> ${atendimento.observacoes || 'Nenhuma'}</p>
-  `;
-
-  modalDet.classList.remove('hidden');
-}
 // --- INICIALIZAÇÃO E EVENTOS ---
-document.addEventListener('DOMContentLoaded', async () => {
-  console.log('🚀 Sistema iniciado: Mapeando elementos...');
+document.addEventListener("DOMContentLoaded", async () => {
+  // MAPEAMENTO CORRETO PELOS IDS DO HTML
+  sistemaArea = document.getElementById("sistema");
+  loginArea = document.getElementById("loginArea");
 
-  // 1. MAPEAMENTO DE ELEMENTOS (Com suporte para múltiplas páginas)
-  modal = document.getElementById('modal-atendimento');
-  modalLista = document.getElementById('modal-listaAtendimentos');
-  modalDetalhes = document.getElementById('modal-detalhes');
-  conteudoDetalhes = document.getElementById('conteudo-detalhes');
-  btnLogin = document.querySelector('.btn-login');
-  sistemaArea = document.getElementById('sistema');
-  loginArea = document.getElementById('loginArea');
+  modal = document.getElementById("modal-atendimento");
 
-  // 2. EVENTO DE LOGIN (Só ativa se o botão existir na tela atual)
-  if (btnLogin) {
-    console.log('✅ Botão de login encontrado.');
-    btnLogin.addEventListener('click', login);
+  // --- NOVA LÓGICA DE VERIFICAÇÃO DE TEMPO ---
+  const loginTime = localStorage.getItem("loginTime");
+  if (loginTime) {
+    const agora = Date.now();
+    const tempoPassado = agora - parseInt(loginTime);
+
+    if (tempoPassado >= TEMPO_LIMITE) {
+      // Se já passou de 3 horas, desloga na hora
+      await executarLogoutAutomatico();
+      return; // Interrompe o resto da inicialização
+    } else {
+      // Se ainda não passou, agenda o logout para o tempo que resta
+      const tempoRestante = TEMPO_LIMITE - tempoPassado;
+      setTimeout(executarLogoutAutomatico, tempoRestante);
+    }
   }
 
-  // 3. FECHAR MODAIS AO CLICAR FORA (Overlay)
-  window.onclick = function (event) {
-    if (event.target === modal) fecharModal();
-    if (event.target === modalDetalhes) fecharDetalhes();
-  };
-
-  // 4. VERIFICAÇÃO DE PÁGINA (Nova Tela de Atendimentos)
-  // Usamos 'includes' porque o caminho pode variar (ex: /atendimentos.html ou atendimentos.html)
-  if (window.location.pathname.includes('atendimentos.html')) {
-    console.log('📂 Você está na tela de LISTA. Carregando dados...');
-    carregar();
-  }
-
-  // 5. CONTROLE DE SESSÃO COM SUPABASE
-  console.log('🔐 Verificando sessão do usuário...');
+  // 5. CONTROLE DE SESSÃO
   try {
     const {
       data: { session },
-      error,
     } = await supabaseCliente.auth.getSession();
 
-    if (error) {
-      console.error('❌ Erro ao buscar sessão:', error.message);
-      return;
-    }
-
     if (session) {
-      console.log('👤 Usuário logado:', session.user.email);
       usuario = session.user;
-      mostrarSistema(); // Mostra a área logada
+      mostrarSistema();
     } else {
-      console.warn('⚠️ Nenhuma sessão ativa encontrada.');
-
-      // Se estiver na tela de atendimentos e não estiver logado, volta pro login
-      if (window.location.pathname.includes('atendimentos.html')) {
-        alert('Sessão encerrada. Por favor, faça login.');
-        window.location.href = 'main.html';
+      ocultarSistema();
+      if (window.location.pathname.includes("atendimentos.html")) {
+        window.location.href = "main.html";
       }
     }
   } catch (err) {
-    console.error('❌ Falha crítica na comunicação com o banco:', err);
+    console.error("❌ Erro:", err);
   }
 });
 
-function fecharDetalhes() {
-  if (modalDetalhes) modalDetalhes.classList.add('hidden');
-}
-
 // Atribuições globais
+// 3. EXECUTAR AO CARREGAR A PÁGINA
+window.onload = () => {
+  ocultarSistema(); // Força a tela de login a aparecer primeiro
+};
 window.login = login;
 window.criar = criar;
-window.carregar = carregar;
 window.abrirModal = abrirModal;
 window.fecharModal = fecharModal;
-window.abrirModalLista = abrirModalLista;
-window.fecharModalLista = fecharModalLista;
-window.fecharDetalhes = fecharDetalhes;
-window.abrirDetalhes = abrirDetalhes;
 window.mostrarSistema = mostrarSistema;
 window.logout = logout;
