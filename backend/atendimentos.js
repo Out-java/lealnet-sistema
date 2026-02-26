@@ -1,31 +1,74 @@
 import { supabaseCliente } from "./server.js";
 
-const modalLista = document.getElementById("modal-listaAtendimentos");
 const modalDetalhes = document.getElementById("modal-detalhes");
 const conteudoDetalhes = document.getElementById("conteudo-detalhes");
-const listaContainer = document.getElementById("lista");
 
-async function carregarAtendimentos() {
-  const { data, error } = await supabaseCliente
+async function carregarAtendimentos(tipoInput) {
+  // 1. LÓGICA DO MENU ATIVO
+  const botoes = document.querySelectorAll(".menu-atendimento button");
+
+  botoes.forEach((btn) => {
+    btn.classList.remove("ativo");
+
+    // Normalizamos o texto: tiramos acentos e deixamos tudo em minúsculo
+    const textoBotao = btn.innerText
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+    const textoInput = tipoInput
+      ? tipoInput
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase()
+      : "";
+
+    // Se o texto do botão for igual ao que foi clicado, ou se for o padrão inicial
+    if (
+      textoBotao === textoInput ||
+      (tipoInput === "Manutencao" && textoBotao === "manutencao")
+    ) {
+      btn.classList.add("ativo");
+    }
+  });
+  // 1. Inicia a query básica
+  let query = supabaseCliente
     .from("atendimentos")
-    .select(`*, tecnicos!atendimentos_tecnico_id_fkey (nome)`)
-    .order("data_abertura", { ascending: false });
+    .select(`*, tecnicos!atendimentos_tecnico_id_fkey (nome)`);
+
+  // 2. SE o tipoInput foi passado, adicionamos o FILTRO (.eq)
+  // Certifique-se que o texto nos botões do HTML bate com o banco (ex: 'Manutencao')
+  if (tipoInput) {
+    query = query.eq("tipo", tipoInput);
+  }
+  const listaContainer = document.getElementById("listaAtendimentos");
+  // 3. Ordenação (opcional, ex: por id mais recente)
+  const { data, error } = await query.order("id", { ascending: false });
 
   if (error) return console.error("Erro:", error);
 
-  listaContainer.innerHTML = data.length ? "" : "<p>Nenhum atendimento.</p>";
+  // 4. Limpa o container e verifica se há dados
+  listaContainer.innerHTML = data.length
+    ? ""
+    : "<p style='color: white;'>Nenhum atendimento encontrado.</p>";
 
+  // 5. Um ÚNICO loop para criar os cards
   data.forEach((a) => {
     const nomeTecnico = a.tecnicos?.nome || "Sem técnico";
     const card = document.createElement("div");
+
+    // Define a classe base e a classe de status (Pendente, Andamento, Finalizado)
     card.className = `card ${a.status}`;
+
     card.innerHTML = `
-            <strong>${a.tipo.toUpperCase()}</strong><br>
-            <strong>Técnico:</strong> ${nomeTecnico}<br>
-            Cliente: ${a.cliente_nome}<br>
-            Status: ${a.status}
-        `;
+        <h3>${a.cliente_nome}</h3>
+        <strong>Técnico:</strong> ${nomeTecnico}<br>
+        <p>${a.observacoes || "Sem observações"}</p>
+        <small>Status: ${a.status}</small>
+    `;
+
+    // Evento de clique para abrir o modal de detalhes
     card.onclick = () => abrirDetalhes(a);
+
     listaContainer.appendChild(card);
   });
 }
@@ -42,23 +85,18 @@ function abrirDetalhes(atendimento) {
   modalDetalhes.classList.remove("hidden");
 }
 
-// 1. Pegamos a referência do fundo escuro
+// Fechamento de modais
 const overlay = document.getElementById("modal-detalhes");
-
-// 2. Escutamos qualquer clique nessa área
-overlay.addEventListener("click", function (event) {
-  // 3. SE o clique foi DIRETAMENTE no fundo (overlay)
-  // e NÃO no conteúdo branco que está dentro dele:
-  if (event.target === overlay) {
-    fecharDetalhes();
-  }
+overlay.addEventListener("click", (event) => {
+  if (event.target === overlay) fecharDetalhes();
 });
 
-// Funções globais para os botões "X" no HTML
-window.fecharModalLista = () => modalLista.classList.add("hidden");
 window.fecharDetalhes = () => modalDetalhes.classList.add("hidden");
 
-// Inicialização
+// Inicialização: carrega TUDO ao abrir a página pela primeira vez
 document.addEventListener("DOMContentLoaded", () => {
-  carregarAtendimentos();
+  carregarAtendimentos("Manutencao");
 });
+
+// Torna a função global para os botões do HTML
+window.carregarAtendimentos = carregarAtendimentos;

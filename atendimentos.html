@@ -7,11 +7,15 @@
     <title>Lista de Atendimento</title>
   </head>
   <body>
+    <nav>
+      <button class="voltarMain"><a href="main.html">DASHBOARD</a></button>
+    </nav>
     <div id="modal-listaAtendimentos">
-      <div class="modal-content-lista">
-        <span onclick="fecharModalLista()" class="fechar">&times;</span>
-        <h2>Lista de Atendimentos</h2>
-        <div id="lista"></div>
+      <div class="menu-atendimento">
+        <button onclick="carregarAtendimentos('Manutencao')">Manutenção</button>
+        <button onclick="carregarAtendimentos('Instalacao')">Instalação</button>
+        <button onclick="carregarAtendimentos('Retirada')">Retirada</button>
+        <div id="listaAtendimentos"></div>
       </div>
     </div>
 

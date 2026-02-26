@@ -23,6 +23,23 @@ body {
   min-height: 100vh;
   padding: 20px;
 }
+button {
+  border-radius: 10px;
+  width: 100px;
+  height: 50px;
+}
+button:hover {
+  background-color: rgb(170, 170, 170);
+}
+.voltarMain {
+  font-style: normal;
+  text-decoration: none;
+}
+
+.voltarMain a {
+  text-decoration: none;
+  color: black;
+}
 
 .modal-content-lista,
 .modal-content-detalhes {
@@ -88,24 +105,54 @@ body {
   margin: 10px 0;
   border-radius: 8px;
   cursor: pointer;
+  max-width: 100%;
 }
 
 .Pendente {
-  border-left: 6px solid #ff4d4d;
-  background-color: #ff000022;
+  border-left: 6px solid #fc2525;
+  background-color: #ff4d4dab;
+  color: white;
   cursor: pointer;
+}
+
+.Pendente small {
+  color: rgb(251, 255, 0);
+  font-weight: bold;
+  background-color: transparent; /* Força o fundo a sumir */
+  border: none;
 }
 .Andamento {
-  border-left: 6px solid #ffc107;
-  background-color: #e5ff0022;
+  border-left: 6px solid #e9af00;
+  background-color: #ffc107c2;
+  color: white;
+
   cursor: pointer;
 }
+.Andamento small {
+  color: rgb(57, 54, 255);
+  font-weight: bold;
+  background-color: transparent; /* Força o fundo a sumir */
+  border: none;
+}
 .Finalizado {
-  border-left: 6px solid #28a745;
-  background-color: #00ff0d22;
+  border-left: 6px solid #149432;
+  background-color: #28a745;
+  color: white;
+
   cursor: pointer;
+}
+
+.Finalizado small {
+  color: rgb(0, 255, 13);
+  font-weight: bold;
+  background-color: transparent; /* Força o fundo a sumir */
+  border: none;
 }
 
 .hidden {
   display: none !important;
+}
+
+.ativo {
+  background-color: rgb(235, 46, 46);
 }
